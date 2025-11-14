@@ -1,0 +1,145 @@
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #191822 0.5%, #000000 100%);
+    font-family: 'Satoshi', sans-serif;
+}
+
+#globeViz {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#logo {
+    position: absolute; top: 30px; left: 30px; width: 180px; border-radius: 5px; z-index:10; /* Multiwasher */
+}
+#logo2 {
+    position: absolute; top: 30px; right: 30px; width: 180px; border-radius: 5px; z-index:10; /* Somengil */
+}
+
+#toggle-container {
+    position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+    z-index: 20; background-color: rgba(255, 255, 255, 0.1); border-radius: 999px;
+    display: flex;
+    padding-top: 10px; 
+    padding-bottom: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    backdrop-filter: blur(3px);
+    /* visible stroke/border */
+    border: 1px solid #686868;
+}
+
+.toggle-btn {
+    position: relative; z-index: 1; padding: 8px 15px; cursor: pointer;
+    color: #000;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+    display: flex; justify-content: center; align-items: center;
+    min-width: 180px;
+}
+.toggle-btn:hover {
+    color: #50B6E8;
+}
+
+.toggle-input { display: none; }
+
+#daily-report:checked ~ .toggle-slider {
+    transform: translateX(0);
+}
+#connected-machines:checked ~ .toggle-slider {
+    transform: translateX(100%);
+}
+
+.toggle-slider {
+    position: absolute; top: 5px; left: 5px;
+    height: calc(100% - 10px);
+    width: calc(49%);
+    background-color: #ffffff;
+    border-radius: 999px;
+    transition: transform .3s ease;
+    z-index: 0; pointer-events: none;
+}
+
+#daily-report:checked + .toggle-btn-label { color: #000; z-index: 1; }
+#connected-machines:checked + .toggle-btn-label { color: #000; z-index: 1; }
+
+/* Inactive toggle button labels - color white */
+#daily-report:not(:checked) + .toggle-btn-label { color: #fff; }
+#connected-machines:not(:checked) + .toggle-btn-label { color: #fff; }
+
+#info-box {
+    position: absolute; top: 50%; right: 12%; transform: translateY(-50%);
+    z-index: 15; padding: 20px; color: #fff;
+    text-align: centlefter; width: 200px;
+}
+#info-box .number {
+    font-size: 3em; font-weight: bold; margin-bottom: 5px;
+}
+#info-box .label {
+    font-size: 1em;
+}
+
+#pie-chart-card {
+    position: absolute; bottom: 30px; left: 30px; z-index: 15;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 24px; padding: 15px; color: #fff;
+    width: 350px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+    display: flex; flex-direction: row; align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    backdrop-filter: blur(3px);
+    /* visible stroke/border */
+    border: 1px solid #686868;
+}
+#pie-chart-card h2 {
+    font-size: 1.2em; margin-bottom: 10px;
+}
+
+#canvas-container { width: 250px; height: 150px; margin-right: 20px; }
+
+#legend { display: flex; flex-direction: column; width: 20px; }
+
+#chart-details {
+    list-style: none; padding: 0; margin: 0; width: 100%; font-size: .9em;
+}
+#chart-details li {
+    padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: space-between;
+}
+#chart-details li:last-child { border-bottom: none; }
+
+.color-swatch {
+    display: inline-block; width: 12px; height: 12px; margin-right: 8px;
+    border-radius: 2px; border: 1px solid rgba(255,255,255,0.3);
+}
+
+#play-pause-container {
+    position: absolute; bottom: 30px; right: 20px; z-index:20;
+}
+
+#playPauseBtn {
+    padding: 10px 20px;
+    background-color: rgba(222,214,213,0.1);
+    color: gray; border: none; border-radius: 5px;
+    cursor: pointer; font-weight: bold;
+    font-family: Arial; display: flex; align-items: center;
+    gap: 8px; transition: background-color .3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+#playPauseBtn:hover { background-color: rgba(255,255,255,0.15); }
