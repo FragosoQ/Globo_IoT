@@ -5,16 +5,29 @@ import { TrackballControls } from 'https://esm.sh/three/examples/jsm/controls/Tr
 // URL do Google Script que retorna o JSON
 const DATA_URL = 'https://script.google.com/macros/s/AKfycbzr1NKomn0Uo3wY-6kXQPaNv6DokUc4esIYBKzW4_SwNDV43wweAOulnraFfGtAh6ww/exec';
 
-// Variável para controlar a rotação
+// Variável para controlar a rotação e a velocidade
 const ROTATE_SPEED = -0.005;
 let isRotating = true;
 
-// Renderer, Scene e Camera são definidos no escopo global para serem acessíveis em onWindowResize e animate
+// Definições da Posição Inicial
+// --- CÂMARA (SUA ESPECIFICAÇÃO) ---
+const INITIAL_CAMERA_POS_X = -50;
+const INITIAL_CAMERA_POS_Y = 200;
+const INITIAL_CAMERA_POS_Z = 350;
+const INITIAL_CAMERA_ROT_X = THREE.MathUtils.degToRad(20);
+
+// --- GLOBO (FOCO NA REPÚBLICA CENTRO-AFRICANA) ---
+// Rotação baseada nas coordenadas aproximadas de Bangui: 5.667°N, 20.0°E
+const INITIAL_GLOBE_ROTATION_X = THREE.MathUtils.degToRad(-5.667); // Negativo para N
+const INITIAL_GLOBE_ROTATION_Y = THREE.MathUtils.degToRad(-20.0); // Negativo para E
+// Nota: Em Three.js/ThreeGlobe, a rotação Y é invertida em relação à Longitude.
+
+// Renderer, Scene e Camera são definidos no escopo global
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-let Globe; // Será inicializado dentro da função assíncrona
-let tbControls; // Será inicializado dentro da função assíncrona
+let Globe; // Inicializado dentro da função assíncrona
+let tbControls; // Inicializado dentro da função assíncrona
 
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO ---
@@ -25,18 +38,17 @@ async function init() {
         if (!response.ok) {
             throw new Error(`Erro HTTP! Status: ${response.status}`);
         }
-        // O JSON retornado do seu link conterá TODOS os arcos (incluindo Lisboa e Porto como end points)
         const todosOsArcos = await response.json(); 
         
         console.log("Dados carregados com sucesso:", todosOsArcos.length, "registos.");
 
-        // 2. PREPARAÇÃO DOS DADOS (IDÊNTICO À LÓGICA ANTERIOR)
+        // 2. PREPARAÇÃO DOS DADOS
 
         // Preparar os pontos de todos os locais (extraindo de TODOS os arcos)
         const pointsData = todosOsArcos.map(d => ({
             lat: d.endLat,
             lng: d.endLng,
-            // Destaca Lisboa (LIS) e Porto (OPO) - Assumindo que o nome é o código IATA ou o nome da cidade
+            // Destaca Lisboa (LIS) e Porto (OPO)
             size: d.name === 'LIS' || d.name === 'OPO' || d.name === 'Lisbon' || d.name === 'Porto' ? 0.25 : 0.2, 
             color: d.name === 'LIS' || d.name === 'Lisbon' ? '#ffffff' : '#0058E8' // Cor para Lisboa
         }));
@@ -58,7 +70,7 @@ async function init() {
         Globe = new ThreeGlobe()
             .globeImageUrl('https://static.wixstatic.com/media/a6967f_cbed4d361eb14d93aff8dcb6ede40613~mv2.jpg')
             .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
-            .arcsData(todosOsArcos) // <--- Dados carregados dinamicamente
+            .arcsData(todosOsArcos) 
             .arcColor(d => t => {
                 const base = new THREE.Color(d.color);       
                 const bright = base.clone();
@@ -90,7 +102,7 @@ async function init() {
         renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
         document.getElementById('globeViz').appendChild(renderer.domElement);
         
-        // Fundo (continua o mesmo)
+        // Fundo
         const gradientTexture = createRadialGradientTexture();
         scene.background = gradientTexture;
         
@@ -98,15 +110,15 @@ async function init() {
         scene.add(new THREE.AmbientLight(0xffffff, Math.PI));
         scene.add(new THREE.DirectionalLight(0xf5f5f5, 4 * Math.PI));
 
-        // Posição da Câmera
-        camera.position.x = -50;
-        camera.position.y = 200;
-        camera.position.z = 350;
-        camera.rotation.x = THREE.MathUtils.degToRad(20);
+        // Posição inicial da Câmera
+        camera.position.x = INITIAL_CAMERA_POS_X;
+        camera.position.y = INITIAL_CAMERA_POS_Y;
+        camera.position.z = INITIAL_CAMERA_POS_Z;
+        camera.rotation.x = INITIAL_CAMERA_ROT_X;
         
-        // Posição inicial do Globo (rotacionado para a área de interesse)
-        Globe.rotation.x = THREE.MathUtils.degToRad(-38.7223);
-        Globe.rotation.y = THREE.MathUtils.degToRad(9.1393);
+        // Posição inicial do Globo (Foco na RCA)
+        Globe.rotation.x = INITIAL_GLOBE_ROTATION_X;
+        Globe.rotation.y = INITIAL_GLOBE_ROTATION_Y;
 
         // Controles
         tbControls = new TrackballControls(camera, renderer.domElement);
@@ -121,13 +133,12 @@ async function init() {
 
     } catch (error) {
         console.error("Erro ao carregar ou processar os dados:", error);
-        // Opcional: Adicionar uma mensagem de erro ao DOM para o utilizador
         document.getElementById('globeViz').innerHTML = "Falha ao carregar os dados do mapa. Verifique a consola para detalhes.";
     }
 }
 
 
-// --- FUNÇÕES DE SETUP E ANIMAÇÃO (mantidas) ---
+// --- FUNÇÕES DE SETUP E ANIMAÇÃO ---
 
 function createRadialGradientTexture() {
     const size = 256;
@@ -157,7 +168,6 @@ window.addEventListener('resize', onWindowResize);
 // Loop de animação
 function animate() {
     requestAnimationFrame(animate);
-    // Verificar se o Globe e tbControls já foram inicializados
     if (Globe && tbControls) { 
         if (isRotating) {
             Globe.rotation.y += ROTATE_SPEED;
@@ -168,9 +178,8 @@ function animate() {
 }
 
 
-// Chart initialization (mantido, mas agora chamado após o carregamento do globo)
+// Chart initialization (mantido)
 function initializeChart() {
-    // ... (Seu código do Chart.js aqui) ...
     const ctx = document.getElementById('machineChart').getContext('2d');
     const data = {
         labels: ['EUROPA', 'AMÉRICA', 'ÁFRICA', 'ÁSIA', 'Oceânia'],
@@ -227,12 +236,26 @@ function initializeChart() {
 }
 
 
-// Lógica do botão Play/Pause (mantida)
+// Lógica do botão Play/Pause (COM REPOSIÇÃO TOTAL E FOCO NA RCA)
 document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('playPauseBtn');
     if (btn) {
         btn.addEventListener('click', () => {
             isRotating = !isRotating;
+            
+            if (isRotating && Globe && tbControls) {
+                // 1. Repor a rotação do globo para focar a República Centro-Africana
+                Globe.rotation.x = INITIAL_GLOBE_ROTATION_X;
+                Globe.rotation.y = INITIAL_GLOBE_ROTATION_Y;
+
+                // 2. Repor a posição e rotação da câmara
+                camera.position.set(INITIAL_CAMERA_POS_X, INITIAL_CAMERA_POS_Y, INITIAL_CAMERA_POS_Z);
+                camera.rotation.x = INITIAL_CAMERA_ROT_X;
+                
+                // 3. Repor os controlos (anula movimentos manuais do utilizador)
+                tbControls.reset(); 
+            }
+            
             btn.innerHTML = isRotating ? 'Pausar Rotação' : 'Iniciar Rotação';
         });
     }
