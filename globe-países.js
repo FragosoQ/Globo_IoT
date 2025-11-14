@@ -80,216 +80,146 @@ export const arcsData = [
       { startLat: 38.7223, startLng: -9.1393, endLat: -33.8678, endLng: 151.2073, name: 'SYD', color: '#50B6E8' }
     ];
     
-    export const pontosAdicionais = [
-      // Portugal (PO)
-      { lat: 38.7169, lng: -9.139, size: 0.3, color: '#0058E8' },
-      { lat: 41.1496, lng: -8.611, size: 0.3, color: '#0058E8' },
-      // Espanha (ES)
-      { lat: 40.4168, lng: -3.7038, size: 0.3, color: '#0058E8' },
-      { lat: 41.3851, lng: 2.1734, size: 0.3, color: '#0058E8' },
-      { lat: 39.4699, lng: -0.3763, size: 0.3, color: '#0058E8' },
-      { lat: 37.3891, lng: -5.9845, size: 0.3, color: '#0058E8' },
-      { lat: 43.263, lng: -2.935, size: 0.3, color: '#0058E8' },
-      // França (FR)
-      { lat: 48.8566, lng: 2.3522, size: 0.3, color: '#0058E8' },
-      { lat: 45.764, lng: 4.8357, size: 0.3, color: '#0058E8' },
-      { lat: 43.2965, lng: 5.3698, size: 0.3, color: '#0058E8' },
-      // Alemanha (AL)
-      { lat: 52.52, lng: 13.405, size: 0.3, color: '#0058E8' },
-      { lat: 48.1351, lng: 11.582, size: 0.3, color: '#0058E8' },
-      { lat: 53.5511, lng: 9.9937, size: 0.3, color: '#0058E8' },
-      { lat: 50.1109, lng: 8.6821, size: 0.3, color: '#0058E8' },
-      { lat: 51.0504, lng: 13.7373, size: 0.3, color: '#0058E8' },
-      // Áustria (AU)
-      { lat: 48.2082, lng: 16.3738, size: 0.3, color: '#0058E8' },
-      { lat: 47.8095, lng: 13.055, size: 0.3, color: '#0058E8' },
-      // Bélgica (BE)
-      { lat: 50.8503, lng: 4.3517, size: 0.3, color: '#0058E8' },
-      { lat: 51.2194, lng: 4.4025, size: 0.3, color: '#0058E8' },
-      { lat: 51.0543, lng: 3.7174, size: 0.3, color: '#0058E8' },
-      // Países Baixos (PA)
-      { lat: 52.3676, lng: 4.9041, size: 0.3, color: '#0058E8' },
-      { lat: 51.9244, lng: 4.4777, size: 0.3, color: '#0058E8' },
-      { lat: 52.0907, lng: 5.1214, size: 0.3, color: '#0058E8' },
-      // Noruega (NO)
-      { lat: 59.9139, lng: 10.7522, size: 0.3, color: '#0058E8' },
-      { lat: 60.3913, lng: 5.3221, size: 0.3, color: '#0058E8' },
-      // Suécia (SU)
-      { lat: 59.3293, lng: 18.0686, size: 0.3, color: '#0058E8' },
-      { lat: 57.7089, lng: 11.9746, size: 0.3, color: '#0058E8' },
-      { lat: 55.605, lng: 13.0038, size: 0.3, color: '#0058E8' },
-      // Dinamarca (DI)
-      { lat: 55.6761, lng: 12.5683, size: 0.3, color: '#0058E8' },
-      { lat: 56.1629, lng: 10.2039, size: 0.3, color: '#0058E8' },
-      // Finlândia (FI)
-      { lat: 60.1695, lng: 24.9355, size: 0.3, color: '#0058E8' },
-      { lat: 60.4518, lng: 22.2666, size: 0.3, color: '#0058E8' },
-      // Islândia (IS)
-      { lat: 64.1355, lng: -21.8954, size: 0.3, color: '#0058E8' },
-      // Irlanda (IR)
-      { lat: 53.3331, lng: -6.2489, size: 0.3, color: '#0058E8' },
-      { lat: 53.2707, lng: -9.0568, size: 0.3, color: '#0058E8' },
-      // Itália (IT)
-      { lat: 41.9028, lng: 12.4964, size: 0.3, color: '#0058E8' },
-      { lat: 45.4642, lng: 9.19, size: 0.3, color: '#0058E8' },
-      { lat: 40.8518, lng: 14.2681, size: 0.3, color: '#0058E8' },
-      { lat: 43.7696, lng: 11.2558, size: 0.3, color: '#0058E8' },
-      { lat: 45.4408, lng: 12.3155, size: 0.3, color: '#0058E8' },
-      // Portugal (PO) - Repetições
-      { lat: 38.7169, lng: -9.139, size: 0.3, color: '#0058E8' },
-      { lat: 41.1496, lng: -8.611, size: 0.3, color: '#0058E8' },
-      // Rep. Tcheca (RE)
-      { lat: 50.0755, lng: 14.4378, size: 0.3, color: '#0058E8' },
-      { lat: 49.1951, lng: 16.6068, size: 0.3, color: '#0058E8' },
-      // Polónia (PO)
-      { lat: 52.2297, lng: 21.0122, size: 0.3, color: '#0058E8' },
-      { lat: 50.0647, lng: 19.945, size: 0.3, color: '#0058E8' },
-      // Roménia (RO)
-      { lat: 44.4268, lng: 26.1025, size: 0.3, color: '#0058E8' },
-      // Hungria (HU)
-      { lat: 47.4979, lng: 19.0402, size: 0.3, color: '#0058E8' },
-      // Bulgária (BU)
-      { lat: 42.6977, lng: 23.3219, size: 0.3, color: '#0058E8' },
-      // Sérvia (SE)
-      { lat: 44.8176, lng: 20.4569, size: 0.3, color: '#0058E8' },
-      // Croácia (CR)
-      { lat: 45.815, lng: 15.9785, size: 0.3, color: '#0058E8' },
-      // Eslovénia (ES)
-      { lat: 46.0569, lng: 14.5058, size: 0.3, color: '#0058E8' },
-      // Macedónia do Norte (MA)
-      { lat: 41.9981, lng: 21.4254, size: 0.3, color: '#0058E8' },
-      // Albânia (AL)
-      { lat: 41.3275, lng: 19.8189, size: 0.3, color: '#0058E8' },
-      // Montenegro (MO)
-      { lat: 42.441, lng: 19.2625, size: 0.3, color: '#0058E8' },
-      // Bósnia (BO)
-      { lat: 43.8563, lng: 18.4131, size: 0.3, color: '#0058E8' },
-      // Kosovo (KO)
-      { lat: 42.6629, lng: 21.1655, size: 0.3, color: '#0058E8' },
-      // Letónia (LE)
-      { lat: 56.946, lng: 24.1059, size: 0.3, color: '#0058E8' },
-      // Lituânia (LI)
-      { lat: 54.6872, lng: 25.2797, size: 0.3, color: '#0058E8' },
-      // Estónia (ES)
-      { lat: 59.437, lng: 24.7536, size: 0.3, color: '#0058E8' },
-      // Luxemburgo (LU)
-      { lat: 49.6116, lng: 6.1319, size: 0.3, color: '#0058E8' },
-      // Malta (MA)
-      { lat: 35.8997, lng: 14.5146, size: 0.3, color: '#0058E8' },
-      // Andorra (AN)
-      { lat: 42.5078, lng: 1.5211, size: 0.3, color: '#0058E8' },
-      // Mónaco (MO)
-      { lat: 43.7384, lng: 7.4246, size: 0.3, color: '#0058E8' },
-      // São Marino (SA)
-      { lat: 43.9336, lng: 12.4484, size: 0.3, color: '#0058E8' },
-      // Islândia (IS) - Repetição
-      { lat: 64.1355, lng: -21.8954, size: 0.3, color: '#0058E8' },
-      // Liechtenstein (LI)
-      { lat: 47.1417, lng: 9.5215, size: 0.3, color: '#0058E8' },
 
-    // Portugal (PO)
-  { lat: 38.7169, lng: -9.139, size: 0.3, color: '#0058E8' },
-  { lat: 41.1496, lng: -8.611, size: 0.3, color: '#0058E8' },
-  // Espanha (ES)
-  { lat: 40.4168, lng: -3.7038, size: 0.3, color: '#0058E8' },
-  { lat: 41.3851, lng: 2.1734, size: 0.3, color: '#0058E8' },
-  { lat: 39.4699, lng: -0.3763, size: 0.3, color: '#0058E8' },
-  { lat: 37.3891, lng: -5.9845, size: 0.3, color: '#0058E8' },
-  { lat: 43.263, lng: -2.935, size: 0.3, color: '#0058E8' },
-  // França (FR)
-  { lat: 48.8566, lng: 2.3522, size: 0.3, color: '#0058E8' },
-  { lat: 45.764, lng: 4.8357, size: 0.3, color: '#0058E8' },
-  { lat: 43.2965, lng: 5.3698, size: 0.3, color: '#0058E8' },
-  // Alemanha (AL)
-  { lat: 52.52, lng: 13.405, size: 0.3, color: '#0058E8' },
-  { lat: 48.1351, lng: 11.582, size: 0.3, color: '#0058E8' },
-  { lat: 53.5511, lng: 9.9937, size: 0.3, color: '#0058E8' },
-  { lat: 50.1109, lng: 8.6821, size: 0.3, color: '#0058E8' },
-  { lat: 51.0504, lng: 13.7373, size: 0.3, color: '#0058E8' },
-  // Áustria (AU)
-  { lat: 48.2082, lng: 16.3738, size: 0.3, color: '#0058E8' },
-  { lat: 47.8095, lng: 13.055, size: 0.3, color: '#0058E8' },
-  // Bélgica (BE)
-  { lat: 50.8503, lng: 4.3517, size: 0.3, color: '#0058E8' },
-  { lat: 51.2194, lng: 4.4025, size: 0.3, color: '#0058E8' },
-  { lat: 51.0543, lng: 3.7174, size: 0.3, color: '#0058E8' },
-  // Países Baixos (PA)
-  { lat: 52.3676, lng: 4.9041, size: 0.3, color: '#0058E8' },
-  { lat: 51.9244, lng: 4.4777, size: 0.3, color: '#0058E8' },
-  { lat: 52.0907, lng: 5.1214, size: 0.3, color: '#0058E8' },
-  // Noruega (NO)
-  { lat: 59.9139, lng: 10.7522, size: 0.3, color: '#0058E8' },
-  { lat: 60.3913, lng: 5.3221, size: 0.3, color: '#0058E8' },
-  // Suécia (SU)
-  { lat: 59.3293, lng: 18.0686, size: 0.3, color: '#0058E8' },
-  { lat: 57.7089, lng: 11.9746, size: 0.3, color: '#0058E8' },
-  { lat: 55.605, lng: 13.0038, size: 0.3, color: '#0058E8' },
-  // Dinamarca (DI)
-  { lat: 55.6761, lng: 12.5683, size: 0.3, color: '#0058E8' },
-  { lat: 56.1629, lng: 10.2039, size: 0.3, color: '#0058E8' },
-  // Finlândia (FI)
-  { lat: 60.1695, lng: 24.9355, size: 0.3, color: '#0058E8' },
-  { lat: 60.4518, lng: 22.2666, size: 0.3, color: '#0058E8' },
-  // Islândia (IS)
-  { lat: 64.1355, lng: -21.8954, size: 0.3, color: '#0058E8' },
-  // Irlanda (IR)
-  { lat: 53.3331, lng: -6.2489, size: 0.3, color: '#0058E8' },
-  { lat: 53.2707, lng: -9.0568, size: 0.3, color: '#0058E8' },
-  // Itália (IT)
-  { lat: 41.9028, lng: 12.4964, size: 0.3, color: '#0058E8' },
-  { lat: 45.4642, lng: 9.19, size: 0.3, color: '#0058E8' },
-  { lat: 40.8518, lng: 14.2681, size: 0.3, color: '#0058E8' },
-  { lat: 43.7696, lng: 11.2558, size: 0.3, color: '#0058E8' },
-  { lat: 45.4408, lng: 12.3155, size: 0.3, color: '#0058E8' },
-  // Portugal (PO) - Repetições
-  { lat: 38.7169, lng: -9.139, size: 0.3, color: '#0058E8' },
-  { lat: 41.1496, lng: -8.611, size: 0.3, color: '#0058E8' },
-  // Rep. Tcheca (RE)
-  { lat: 50.0755, lng: 14.4378, size: 0.3, color: '#0058E8' },
-  { lat: 49.1951, lng: 16.6068, size: 0.3, color: '#0058E8' },
-  // Polónia (PO)
-  { lat: 52.2297, lng: 21.0122, size: 0.3, color: '#0058E8' },
-  { lat: 50.0647, lng: 19.945, size: 0.3, color: '#0058E8' },
-  // Roménia (RO)
-  { lat: 44.4268, lng: 26.1025, size: 0.3, color: '#0058E8' },
-  // Hungria (HU)
-  { lat: 47.4979, lng: 19.0402, size: 0.3, color: '#0058E8' },
-  // Bulgária (BU)
-  { lat: 42.6977, lng: 23.3219, size: 0.3, color: '#0058E8' },
-  // Sérvia (SE)
-  { lat: 44.8176, lng: 20.4569, size: 0.3, color: '#0058E8' },
-  // Croácia (CR)
-  { lat: 45.815, lng: 15.9785, size: 0.3, color: '#0058E8' },
-  // Eslovénia (ES)
-  { lat: 46.0569, lng: 14.5058, size: 0.3, color: '#0058E8' },
-  // Macedónia do Norte (MA)
-  { lat: 41.9981, lng: 21.4254, size: 0.3, color: '#0058E8' },
-  // Albânia (AL)
-  { lat: 41.3275, lng: 19.8189, size: 0.3, color: '#0058E8' },
-  // Montenegro (MO)
-  { lat: 42.441, lng: 19.2625, size: 0.3, color: '#0058E8' },
-  // Bósnia (BO)
-  { lat: 43.8563, lng: 18.4131, size: 0.3, color: '#0058E8' },
-  // Kosovo (KO)
-  { lat: 42.6629, lng: 21.1655, size: 0.3, color: '#0058E8' },
-  // Letónia (LE)
-  { lat: 56.946, lng: 24.1059, size: 0.3, color: '#0058E8' },
-  // Lituânia (LI)
-  { lat: 54.6872, lng: 25.2797, size: 0.3, color: '#0058E8' },
-  // Estónia (ES)
-  { lat: 59.437, lng: 24.7536, size: 0.3, color: '#0058E8' },
-  // Luxemburgo (LU)
-  { lat: 49.6116, lng: 6.1319, size: 0.3, color: '#0058E8' },
-  // Malta (MA)
-  { lat: 35.8997, lng: 14.5146, size: 0.3, color: '#0058E8' },
-  // Andorra (AN)
-  { lat: 42.5078, lng: 1.5211, size: 0.3, color: '#0058E8' },
-  // Mónaco (MO)
-  { lat: 43.7384, lng: 7.4246, size: 0.3, color: '#0058E8' },
-  // São Marino (SA)
-  { lat: 43.9336, lng: 12.4484, size: 0.3, color: '#0058E8' },
-  // Islândia (IS) - Repetição
-  { lat: 64.1355, lng: -21.8954, size: 0.3, color: '#0058E8' },
-  // Liechtenstein (LI)
-  { lat: 47.1417, lng: 9.5215, size: 0.3, color: '#0058E8' },
-    ];
+
+      // Coordenadas de Início (Lisboa - Ponto Fixo)
+const START_LAT = 38.7169;
+const START_LNG = -9.139;
+
+export const pontosAdicionais = [
+    // Portugal (PO) - Porto
+    { startLat: START_LAT, startLng: START_LNG, endLat: 41.1496, endLng: -8.611, name: 'Porto', color: '#0058E8' },
+    
+    // Espanha (ES)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 40.4168, endLng: -3.7038, name: 'Madrid', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 41.3851, endLng: 2.1734, name: 'Barcelona', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 39.4699, endLng: -0.3763, name: 'Valencia', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 37.3891, endLng: -5.9845, name: 'Sevilha', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 43.263, endLng: -2.935, name: 'Bilbao', color: '#0058E8' },
+    
+    // França (FR)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 48.8566, endLng: 2.3522, name: 'Paris', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 45.764, endLng: 4.8357, name: 'Lyon', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 43.2965, endLng: 5.3698, name: 'Marseille', color: '#0058E8' },
+    
+    // Alemanha (AL)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 52.52, endLng: 13.405, name: 'Berlin', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 48.1351, endLng: 11.582, name: 'Munich', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 53.5511, endLng: 9.9937, name: 'Hamburg', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 50.1109, endLng: 8.6821, name: 'Frankfurt', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 51.0504, endLng: 13.7373, name: 'Dresden', color: '#0058E8' },
+    
+    // Áustria (AU)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 48.2082, endLng: 16.3738, name: 'Vienna', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 47.8095, endLng: 13.055, name: 'Salzburg', color: '#0058E8' },
+    
+    // Bélgica (BE)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 50.8503, endLng: 4.3517, name: 'Brussels', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 51.2194, endLng: 4.4025, name: 'Antwerp', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 51.0543, endLng: 3.7174, name: 'Ghent', color: '#0058E8' },
+    
+    // Países Baixos (PA)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 52.3676, endLng: 4.9041, name: 'Amsterdam', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 51.9244, endLng: 4.4777, name: 'Rotterdam', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 52.0907, endLng: 5.1214, name: 'Utrecht', color: '#0058E8' },
+    
+    // Noruega (NO)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 59.9139, endLng: 10.7522, name: 'Oslo', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 60.3913, endLng: 5.3221, name: 'Bergen', color: '#0058E8' },
+    
+    // Suécia (SU)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 59.3293, endLng: 18.0686, name: 'Stockholm', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 57.7089, endLng: 11.9746, name: 'Gothenburg', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 55.605, endLng: 13.0038, name: 'Malmo', color: '#0058E8' },
+    
+    // Dinamarca (DI)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 55.6761, endLng: 12.5683, name: 'Copenhagen', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 56.1629, endLng: 10.2039, name: 'Aarhus', color: '#0058E8' },
+    
+    // Finlândia (FI)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 60.1695, endLng: 24.9355, name: 'Helsinki', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 60.4518, endLng: 22.2666, name: 'Turku', color: '#0058E8' },
+    
+    // Islândia (IS)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 64.1355, endLng: -21.8954, name: 'Reykjavik', color: '#0058E8' },
+    
+    // Irlanda (IR)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 53.3331, endLng: -6.2489, name: 'Dublin', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 53.2707, endLng: -9.0568, name: 'Galway', color: '#0058E8' },
+    
+    // Itália (IT)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 41.9028, endLng: 12.4964, name: 'Rome', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 45.4642, endLng: 9.19, name: 'Milan', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 40.8518, endLng: 14.2681, name: 'Naples', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 43.7696, endLng: 11.2558, name: 'Florence', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 45.4408, endLng: 12.3155, name: 'Venice', color: '#0058E8' },
+    
+    // Rep. Tcheca (CZ)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 50.0755, endLng: 14.4378, name: 'Prague', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 49.1951, endLng: 16.6068, name: 'Brno', color: '#0058E8' },
+    
+    // Polónia (PL)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 52.2297, endLng: 21.0122, name: 'Warsaw', color: '#0058E8' },
+    { startLat: START_LAT, startLng: START_LNG, endLat: 50.0647, endLng: 19.945, name: 'Krakow', color: '#0058E8' },
+    
+    // Roménia (RO)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 44.4268, endLng: 26.1025, name: 'Bucharest', color: '#0058E8' },
+    
+    // Hungria (HU)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 47.4979, endLng: 19.0402, name: 'Budapest', color: '#0058E8' },
+    
+    // Bulgária (BG)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 42.6977, endLng: 23.3219, name: 'Sofia', color: '#0058E8' },
+    
+    // Sérvia (RS)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 44.8176, endLng: 20.4569, name: 'Belgrade', color: '#0058E8' },
+    
+    // Croácia (HR)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 45.815, endLng: 15.9785, name: 'Zagreb', color: '#0058E8' },
+    
+    // Eslovénia (SI)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 46.0569, endLng: 14.5058, name: 'Ljubljana', color: '#0058E8' },
+    
+    // Macedónia do Norte (MK)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 41.9981, endLng: 21.4254, name: 'Skopje', color: '#0058E8' },
+    
+    // Albânia (AL)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 41.3275, endLng: 19.8189, name: 'Tirana', color: '#0058E8' },
+    
+    // Montenegro (ME)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 42.441, endLng: 19.2625, name: 'Podgorica', color: '#0058E8' },
+    
+    // Bósnia e Herzegovina (BA)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 43.8563, endLng: 18.4131, name: 'Sarajevo', color: '#0058E8' },
+    
+    // Kosovo (XK)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 42.6629, endLng: 21.1655, name: 'Pristina', color: '#0058E8' },
+    
+    // Letónia (LV)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 56.946, endLng: 24.1059, name: 'Riga', color: '#0058E8' },
+    
+    // Lituânia (LT)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 54.6872, endLng: 25.2797, name: 'Vilnius', color: '#0058E8' },
+    
+    // Estónia (EE)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 59.437, endLng: 24.7536, name: 'Tallinn', color: '#0058E8' },
+    
+    // Luxemburgo (LU)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 49.6116, endLng: 6.1319, name: 'Luxembourg', color: '#0058E8' },
+    
+    // Malta (MT)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 35.8997, endLng: 14.5146, name: 'Valletta', color: '#0058E8' },
+    
+    // Andorra (AD)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 42.5078, endLng: 1.5211, name: 'Andorra la Vella', color: '#0058E8' },
+    
+    // Mónaco (MC)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 43.7384, endLng: 7.4246, name: 'Monaco', color: '#0058E8' },
+    
+    // São Marino (SM)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 43.9336, endLng: 12.4484, name: 'San Marino', color: '#0058E8' },
+    
+    // Liechtenstein (LI)
+    { startLat: START_LAT, startLng: START_LNG, endLat: 47.1417, endLng: 9.5215, name: 'Vaduz', color: '#0058E8' },
+];
+    
