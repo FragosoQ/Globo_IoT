@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <!-- Carregar Tailwind CSS para estilos base e responsividade -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8; /* Fundo levemente cinza */
+            color: #1f2937;
+            padding: 24px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .data-table {
+            width: 100%;
+            border-collapse: separate; /* Permite cantos arredondados no wrapper */
+            border-spacing: 0;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .data-table th {
+            background-color: #e5e5e5; /* Fundo do cabeçalho levemente cinza */
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: #4b5563;
+        }
+        /* Arredonda os cantos do cabeçalho */
+        .data-table thead tr:first-child th:first-child { border-top-left-radius: 8px; }
+        .data-table thead tr:first-child th:last-child { border-top-right-radius: 8px; }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f3f4f6; /* Fundo muito claro para linhas pares */
+        }
+        .data-table tr:hover {
+            background-color: #e0e0e0;
+        }
+        .loading-message { 
+            color: #4f46e5; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            text-align: center; 
+            padding: 50px; 
+            background-color: #eef2ff;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+        .error-message { 
+            color: #dc2626; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            text-align: center; 
+            padding: 50px; 
+            background-color: #fee2e2; 
+            border-radius: 8px; 
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Título e Mensagem de Status (Descomentados) -->
+        <h1 class="text-4xl font-extrabold text-center mb-10 mt-4 text-gray-800"></h1>
+
+        <div id="statusMessage" class="loading-message">A carregar dados da Google Sheet...</div>
+
+        <!-- Tabela (escondida até os dados serem carregados) -->
+        <div class="overflow-x-auto shadow-xl rounded-lg mt-8 hidden" id="tableWrapper">
+            <table class="min-w-full data-table">
+                <thead>
+                    <tr>
+                        <th>Código IATA</th>
+                        <th>Cor (Hex/RGBA)</th>
+                        <th>Lat. Partida</th>
+                        <th>Long. Partida</th>
+                        <th>Lat. Destino</th>
+                        <th>Long. Destino</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    <!-- Linhas da tabela serão inseridas aqui pelo JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Dados Estruturais Fixos
+        const START_LAT = '38.7223';
+        const START_LNG = '-9.1393';
+        
+        // ID da sua Google Sheet
+        const SHEET_ID = '1e7iYEB6OH00aT5hqE6pi6qmafitHq8BNvHt7Fo0wW_8';
+        
+        // URL da API de Visualização do Google Sheets, solicitando JSON
+        // O gviz/tq acede a API de Query, e out:json pede o formato que o JS consegue processar.
+        // A falta do "gid" (ID do separador) fará com que leia o PRIMEIRO separador (o que é ideal para o DATA1).
+        const SHEET_API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+        const tableBody = document.getElementById('dataTableBody');
+        const statusMessage = document.getElementById('statusMessage');
+        const tableWrapper = document.getElementById('tableWrapper');
+
+        /**
+         * Insere uma linha na tabela com base nos dados de uma rota.
+         * @param {object} data - Objeto de rota {code, color, endLat, endLng}.
+         */
+        function insertRow(data) {
+            const row = tableBody.insertRow();
+            
+            // As células são inseridas na ordem do cabeçalho
+            const values = [
+                data.code,
+                data.color,
+                START_LAT, // Constante
+                START_LNG, // Constante
+                data.endLat,
+                data.endLng
+            ];
+            
+            values.forEach((value, index) => {
+                let cell = row.insertCell();
+                cell.textContent = value || 'N/A'; // Adiciona N/A se o valor for nulo
+                
+                // Aplica negrito à coluna da Cor
+                if (index === 1) {
+                    cell.style.fontWeight = 'bold';
+                }
+            });
+        }
+
+        /**
+         * Processa a resposta JSON da API do Google Sheets e preenche a tabela.
+         * @param {string} jsonText - O texto JSON bruto da resposta (com o invólucro).
+         */
+        function processSheetData(jsonText) {
+            // 1. Remove o invólucro 'google.visualization.Query.setResponse(...)'
+            const match = jsonText.match(/google.visualization.Query.setResponse\((.*)\);/);
+            
+            if (!match || !match[1]) {
+                 console.error("Formato de resposta inesperado da API.");
+                 statusMessage.className = 'error-message';
+                 statusMessage.textContent = 'ERRO: Não foi possível processar os dados. Confirme se o Sheet está partilhado publicamente.';
+                 return;
+            }
+
+            let dataObject;
+            try {
+                // 2. Faz o parse do JSON limpo
+                dataObject = JSON.parse(match[1]);
+            } catch (e) {
+                console.error("Erro ao fazer parse do JSON do Google Sheet:", e);
+                statusMessage.className = 'error-message';
+                statusMessage.textContent = 'ERRO: O JSON não é válido. O Sheet está a gerar dados corretos?';
+                return;
+            }
+
+            const tableData = dataObject.table;
+            
+            if (!tableData || !tableData.rows || tableData.rows.length === 0) {
+                statusMessage.className = 'loading-message'; // Usa a cor azul para indicar sucesso, mas sem dados
+                statusMessage.textContent = 'A folha de dados está vazia ou inacessível.';
+                return;
+            }
+            
+            // 3. Itera sobre as linhas de dados
+            tableData.rows.forEach(row => {
+                // O array 'c' contém as células da linha
+                const cells = row.c;
+                
+                // Colunas A, B, C, D (índices 0, 1, 2, 3)
+                // Usamos o operador de curto-circuito (&&) para extrair o valor ('v') de forma segura
+                
+                const route = {
+                    code: cells[0] && cells[0].v,
+                    color: cells[1] && cells[1].v,
+                    endLat: cells[2] && cells[2].v,
+                    endLng: cells[3] && cells[3].v,
+                };
+
+                // Apenas insere se tiver os dados mínimos de localização
+                if (route.code && route.endLat) {
+                    insertRow(route);
+                }
+            });
+
+            // 4. Mostra a tabela e esconde a mensagem de estado
+            tableWrapper.classList.remove('hidden');
+            statusMessage.classList.add('hidden');
+        }
+
+        /**
+         * Inicia o carregamento dos dados da Google Sheet.
+         */
+        function loadSheetData() {
+            // Limpa a tabela antes de carregar
+            tableBody.innerHTML = ''; 
+            statusMessage.classList.remove('hidden', 'error-message');
+            statusMessage.className = 'loading-message';
+            statusMessage.textContent = 'A carregar dados da Google Sheet...';
+            tableWrapper.classList.add('hidden');
+
+            fetch(SHEET_API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    // O CORS é gerido automaticamente pela API de Visualização do Google Sheets
+                    processSheetData(text);
+                })
+                .catch(error => {
+                    console.error("Falha ao carregar a Google Sheet:", error);
+                    statusMessage.className = 'error-message';
+                    statusMessage.textContent = `ERRO: Não foi possível carregar a folha. Causa: ${error.message}. Confirme que a folha inteira está partilhada publicamente.`;
+                });
+        }
+
+        // Inicia o carregamento quando a página está pronta
+        window.onload = loadSheetData;
+    </script>
+</body>
+</html>
