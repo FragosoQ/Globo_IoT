@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Rota para Google Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos de layout e tipografia */
+        body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { 
+            background-color: white; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
+            padding: 32px; 
+            width: 100%; 
+            max-width: 480px; 
+        }
+        .input-group label { font-weight: 500; color: #374151; margin-bottom: 4px; display: block; }
+        .input-group input { 
+            border: 1px solid #d1d5db; 
+            border-radius: 6px; 
+            padding: 10px 14px; 
+            width: 100%; 
+            transition: border-color 0.2s; 
+        }
+        .input-group input:focus { 
+            border-color: #4f46e5; 
+            outline: none; 
+            box-shadow: 0 0 0 1px #4f46e5; 
+        }
+        /* Estilos do botão principal */
+        .btn-primary { 
+            background-color: #10b981; /* Cor verde-esmeralda para "adicionar" */
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            transition: background-color 0.2s; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary:hover { background-color: #059669; }
+        .btn-primary:active { transform: translateY(1px); }
+        .btn-primary:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        /* Estilos das caixas de mensagem */
+        .message-box { padding: 12px; margin-top: 16px; border-radius: 6px; font-weight: 500; text-align: center; }
+        .success { background-color: #d1fae5; color: #065f46; border: 1px solid #065f46; }
+        .error { background-color: #fee2e2; color: #991b1b; border: 1px solid #991b1b; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Enviar Nova Rota para Google Sheet</h1>
+        <p class="text-sm text-center text-gray-600 mb-6">Os dados serão enviados para o seu Script do Google Apps.</p>
+        
+        <form id="routeForm" class="space-y-4">
+            <div class="input-group">
+                <label for="code">Código IATA (3 letras)</label>
+                <input type="text" id="code" name="code" maxlength="3" required placeholder="Ex: GUA">
+            </div>
+
+            <div class="input-group">
+                <label for="color">Cor (Hex ou RGBA)</label>
+                <input type="text" id="color" name="color" required placeholder="Ex: #50B6E8">
+            </div>
+
+            <div class="flex space-x-4">
+                <div class="input-group flex-1">
+                    <label for="endLat">Lat. Destino</label>
+                    <input type="number" id="endLat" name="endLat" step="any" required placeholder="Ex: 14.6349">
+                </div>
+                <div class="input-group flex-1">
+                    <label for="endLng">Long. Destino</label>
+                    <input type="number" id="endLng" name="endLng" step="any" required placeholder="Ex: -90.5069">
+                </div>
+            </div>
+
+            <div class="text-xs text-gray-500 pt-2 text-center">
+                *Coordenadas de partida fixas (Lisboa).
+            </div>
+
+            <button type="submit" id="submitButton" class="btn-primary w-full mt-6">
+                Enviar Rota para Sheet
+            </button>
+
+            <div id="messageBox" class="message-box hidden"></div>
+        </form>
+    </div>
+
+    <script>
+        // ESTE É O ENDPOINT DO SEU SCRIPT DEPLOYED (MUITO IMPORTANTE!)
+        // SUBSTITUA ESTE VALOR PELO URL REAL DA SUA WEB APP DEPLOYADA.
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzGLNbBjQeRm7ErPl9JZzNWb9Sm4ZquiWAGEk-6e8pFjXhTxq843pCBgbEPtMKeINNB/exec'; // <--- SUBSTITUA AQUI!
+        
+        const form = document.getElementById('routeForm');
+        const messageBox = document.getElementById('messageBox');
+        const submitButton = document.getElementById('submitButton');
+
+        /**
+         * Mostra uma mensagem de feedback.
+         * @param {string} text - O texto da mensagem.
+         * @param {string} type - 'success' ou 'error'.
+         */
+        function showMessage(text, type) {
+            messageBox.textContent = text;
+            messageBox.className = `message-box ${type}`;
+            messageBox.classList.remove('hidden');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Desativar botão e mostrar loading
+            submitButton.disabled = true;
+            submitButton.textContent = 'A enviar dados...';
+            messageBox.classList.add('hidden');
+
+            // 1. Coleta dos dados do formulário
+            const formData = new FormData(form);
+
+            // Verifica se o URL foi substituído
+            if (WEB_APP_URL.includes('EXEMPLO-DO-SEU-DEPLOYMENT')) {
+                showMessage('ERRO: Por favor, insira o URL de Deployment real do seu Google Apps Script no código JavaScript.', 'error');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Rota para Sheet';
+                return;
+            }
+
+            // 2. Converte os dados para o formato URL-encoded, como o script espera
+            // O URLSearchParams é a forma correta de formatar dados POST para o Google Apps Script.
+            const data = new URLSearchParams(formData);
+
+            try {
+                // 3. Envio da requisição POST para o Apps Script
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // O Google Apps Script exige 'no-cors' para requisições simples POST de formulário
+                    cache: 'no-cache',
+                    body: data // O corpo já está no formato correto
+                });
+
+                // Como usamos 'no-cors', a resposta HTTP é opaca e não podemos ler o JSON.
+                // O script do Google Apps fará o trabalho e retornará o sucesso internamente.
+                // Assumimos sucesso se a requisição não falhar no nível da rede.
+
+                showMessage(`Rota ${formData.get('code').toUpperCase()} enviada! Por favor, verifique a folha de cálculo.`, 'success');
+                form.reset(); // Limpa o formulário
+
+            } catch (error) {
+                console.error("Erro ao enviar para Google Sheet:", error);
+                // Este erro é geralmente um erro de rede ou URL inválido
+                showMessage(`ERRO de Comunicação: Verifique o URL do Script (${AKfycby7se_8rEzy74h4QT7p2pnwC5BcmZNCD-oI9ZEV-IA
+}) e o estado da sua rede.`, 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Rota para Sheet';
+            }
+        });
+    </script>
+</body>
+</html>
