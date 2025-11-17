@@ -78,8 +78,9 @@ async function init() {
 
                 const color = base.clone().lerp(bright, t);
 
-                const alpha = t;  
-                return `rgba(${Math.round(color.r*255)}, ${Math.round(color.g*255)}, ${Math.round(color.b*255)}, ${alpha})`;
+                // INVERSÃO DO SENTIDO: Usa 1 - t para que o traço vá do fim para o início
+                const alpha = **1 - t**;  
+                return `rgba(${Math.round(color.r*255)}, ${Math.round(color.g*255)}, ${Math.round(color.b*255)}, ${alpha})`;
             })
             .arcDashLength(0.4)
             .arcDashGap(4)
