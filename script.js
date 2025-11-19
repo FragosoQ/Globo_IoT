@@ -63,7 +63,7 @@ async function init() {
             strokeWidth: 1.0005
         }));
 
-        // 2.3 Preparar os ARCOS ALEATÓRIOS (MIX DE DIREÇÕES)
+        /*// 2.3 Preparar os ARCOS ALEATÓRIOS (MIX DE DIREÇÕES)
         const arcosAleatorios = todosOsArcos.map(d => {
             // Gera um número entre 0 e 1. Se for > 0.5, inverte o sentido.
             if (Math.random() > 0.7) {
@@ -78,7 +78,7 @@ async function init() {
                 // Mantém o sentido original
                 return d;
             }
-        });
+        });*/
 
         // 3. CRIAÇÃO DO GLOBO
         Globe = new ThreeGlobe()
