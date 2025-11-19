@@ -82,7 +82,8 @@ async function init() {
 
         // 3. CRIAÇÃO DO GLOBO
         Globe = new ThreeGlobe()
-            .globeImageUrl('https://static.wixstatic.com/media/a6967f_cbed4d361eb14d93aff8dcb6ede40613~mv2.jpg')
+           //.globeImageUrl('https://static.wixstatic.com/media/a6967f_c8009fd3be5a499782d5b778a2f7483e~mv2.png')
+            //.globeImageUrl('https://static.wixstatic.com/media/a6967f_cbed4d361eb14d93aff8dcb6ede40613~mv2.jpg')
             .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
             // AQUI USAMOS OS DADOS MISTURADOS/ALEATÓRIOS
             .arcsData(arcosAleatorios) 
