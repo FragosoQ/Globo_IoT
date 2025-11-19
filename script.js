@@ -83,7 +83,7 @@ async function init() {
         // 3. CRIAÇÃO DO GLOBO
         Globe = new ThreeGlobe()
            //.globeImageUrl('https://static.wixstatic.com/media/a6967f_c8009fd3be5a499782d5b778a2f7483e~mv2.png')
-            //.globeImageUrl('https://static.wixstatic.com/media/a6967f_cbed4d361eb14d93aff8dcb6ede40613~mv2.jpg')
+            .globeImageUrl('https://static.wixstatic.com/media/a6967f_c8009fd3be5a499782d5b778a2f7483e~mv2.png')
             .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
             // AQUI USAMOS OS DADOS MISTURADOS/ALEATÓRIOS
             .arcsData(arcosAleatorios) 
@@ -234,61 +234,6 @@ function initializeChart() {
 
 // --- LÓGICA DE INTERAÇÃO DO DOM (TECLADO, RATO, BOTÕES) ---
 document.addEventListener('DOMContentLoaded', () => {
-
-    // 1. GESTÃO DO CURSOR (Esconder após 5s)
-    let cursorTimer;
-    const manageCursorVisibility = () => {
-        // Mostra o cursor
-        document.body.style.cursor = 'default';
-        
-        // Reinicia o timer
-        clearTimeout(cursorTimer);
-
-        // Define novo timer de 5 segundos
-        cursorTimer = setTimeout(() => {
-            document.body.style.cursor = 'none'; // Esconde
-        }, 5000);
-    };
-
-    // Deteta movimento do rato em toda a página
-    document.addEventListener('mousemove', manageCursorVisibility);
-    manageCursorVisibility(); // Inicia contagem logo ao carregar
-
-
-    // 2. LÓGICA DOS BOTÕES DE RELATÓRIO (CONNECTED / MULTIWASHER)
-    const inputConnected = document.getElementById('daily-report');
-    const inputMultiwasher = document.getElementById('connected-machines');
-
-    const handleEnterToggle = (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // Impede comportamento padrão
-
-            if (e.target === inputConnected) {
-                // Estava no Connected -> Vai para Multiwasher
-                console.log("Enter no Connected -> Mudando para Multiwasher");
-                inputMultiwasher.checked = true;
-                inputMultiwasher.focus();
-                inputMultiwasher.dispatchEvent(new Event('change'));
-            } 
-            else if (e.target === inputMultiwasher) {
-                // Estava no Multiwasher -> Vai para Connected
-                console.log("Enter no Multiwasher -> Mudando para Connected");
-                inputConnected.checked = true;
-                inputConnected.focus();
-                inputConnected.dispatchEvent(new Event('change'));
-            }
-        }
-    };
-
-    if (inputConnected && inputMultiwasher) {
-        // Adiciona ouvintes de teclado
-        inputConnected.addEventListener('keydown', handleEnterToggle);
-        inputMultiwasher.addEventListener('keydown', handleEnterToggle);
-
-        // --- FOCO INICIAL AUTOMÁTICO ---
-        inputConnected.focus();
-    }
-
 
     // 3. LÓGICA DO BOTÃO PLAY/PAUSE
     const btnPlayPause = document.getElementById('playPauseBtn');
