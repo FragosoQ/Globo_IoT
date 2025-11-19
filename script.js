@@ -42,7 +42,7 @@ async function init() {
 
         // 2. PREPARAÇÃO DOS DADOS
         
-        // 2.1 Preparar os PONTOS (Mantemos os dados originais para as bolhas ficarem no destino correto)
+        // 2.1 Preparar os PONTOS
         const pointsData = todosOsArcos.map(d => ({
             lat: d.endLat,
             lng: d.endLng,
@@ -50,7 +50,7 @@ async function init() {
             color: d.name === 'LIS' || d.name === 'Lisbon' ? '#ffffff' : '#0058E8'
         }));
 
-        // 2.2 Preparar as LABELS (Mantemos os dados originais)
+        // 2.2 Preparar as LABELS
         const labelsData = todosOsArcos.map(d => ({
             lat: d.endLat,
             lng: d.endLng,
@@ -63,30 +63,14 @@ async function init() {
             strokeWidth: 1.0005
         }));
 
-        /*// 2.3 Preparar os ARCOS ALEATÓRIOS (MIX DE DIREÇÕES)
-        const arcosAleatorios = todosOsArcos.map(d => {
-            // Gera um número entre 0 e 1. Se for > 0.5, inverte o sentido.
-            if (Math.random() > 0.7) {
-                return {
-                    ...d, 
-                    startLat: d.endLat, // Inverte: Fim vira Início
-                    startLng: d.endLng,
-                    endLat: d.startLat, // Inverte: Início vira Fim
-                    endLng: d.startLng
-                };
-            } else {
-                // Mantém o sentido original
-                return d;
-            }
-        });*/
+        // (REMOVIDO: Lógica dos Arcos Aleatórios - agora usamos 'todosOsArcos' diretamente abaixo)
 
         // 3. CRIAÇÃO DO GLOBO
         Globe = new ThreeGlobe()
-           //.globeImageUrl('https://static.wixstatic.com/media/a6967f_c8009fd3be5a499782d5b778a2f7483e~mv2.png')
             .globeImageUrl('https://static.wixstatic.com/media/a6967f_c8009fd3be5a499782d5b778a2f7483e~mv2.png')
             .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
-            // AQUI USAMOS OS DADOS MISTURADOS/ALEATÓRIOS
-            .arcsData(arcosAleatorios) 
+            // USAMOS OS DADOS ORIGINAIS (Sem inversão aleatória)
+            .arcsData(todosOsArcos) 
             .arcColor(d => t => {
                 const base = new THREE.Color(d.color);       
                 const bright = base.clone();
@@ -100,7 +84,6 @@ async function init() {
             .arcDashInitialGap(() => Math.random() * 5)
             .arcDashAnimateTime(1000)
             .arcStroke(1)   
-            // AQUI USAMOS OS DADOS ORIGINAIS (Pontos fixos)
             .pointsData(pointsData)
             .pointAltitude(0)
             .pointColor('color')
@@ -112,6 +95,13 @@ async function init() {
             .labelDotRadius('labelDotRadius')
             .labelText('text')
             .labelResolution(3);
+
+        // --- CONFIGURAÇÃO DE TRANSLUCIDEZ DO GLOBO ---
+        const globeMaterial = Globe.globeMaterial();
+        globeMaterial.transparent = true;  // Ativa transparência
+        globeMaterial.opacity = 0.5;       // 50% visível (Ajuste conforme gosto)
+        globeMaterial.color = new THREE.Color(0x000000); // Base preta para manter contraste
+        // ---------------------------------------------
 
         // 4. CONFIGURAÇÃO DA CENA E CÂMERA
         renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
