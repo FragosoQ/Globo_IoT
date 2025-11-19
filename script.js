@@ -10,17 +10,15 @@ const ROTATE_SPEED = -0.005;
 let isRotating = true;
 
 // Definições da Posição Inicial
-// --- CÂMARA (SUA ESPECIFICAÇÃO) ---
+// --- CÂMARA ---
 const INITIAL_CAMERA_POS_X = -50;
 const INITIAL_CAMERA_POS_Y = 200;
 const INITIAL_CAMERA_POS_Z = 350;
 const INITIAL_CAMERA_ROT_X = THREE.MathUtils.degToRad(20);
 
 // --- GLOBO (FOCO NA REPÚBLICA CENTRO-AFRICANA) ---
-// Rotação baseada nas coordenadas aproximadas de Bangui: 5.667°N, 20.0°E
 const INITIAL_GLOBE_ROTATION_X = THREE.MathUtils.degToRad(-5.667); // Negativo para N
 const INITIAL_GLOBE_ROTATION_Y = THREE.MathUtils.degToRad(-20.0); // Negativo para E
-// Nota: Em Three.js/ThreeGlobe, a rotação Y é invertida em relação à Longitude.
 
 // Renderer, Scene e Camera são definidos no escopo global
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -43,17 +41,16 @@ async function init() {
         console.log("Dados carregados com sucesso:", todosOsArcos.length, "registos.");
 
         // 2. PREPARAÇÃO DOS DADOS
-
-        // Preparar os pontos de todos os locais (extraindo de TODOS os arcos)
+        
+        // 2.1 Preparar os PONTOS (Mantemos os dados originais para as bolhas ficarem no destino correto)
         const pointsData = todosOsArcos.map(d => ({
             lat: d.endLat,
             lng: d.endLng,
-            // Destaca Lisboa (LIS) e Porto (OPO)
             size: d.name === 'LIS' || d.name === 'OPO' || d.name === 'Lisbon' || d.name === 'Porto' ? 0.25 : 0.2, 
-            color: d.name === 'LIS' || d.name === 'Lisbon' ? '#ffffff' : '#0058E8' // Cor para Lisboa
+            color: d.name === 'LIS' || d.name === 'Lisbon' ? '#ffffff' : '#0058E8'
         }));
 
-        // Labels (extraindo de TODOS os arcos)
+        // 2.2 Preparar as LABELS (Mantemos os dados originais)
         const labelsData = todosOsArcos.map(d => ({
             lat: d.endLat,
             lng: d.endLng,
@@ -66,27 +63,43 @@ async function init() {
             strokeWidth: 1.0005
         }));
 
+        // 2.3 Preparar os ARCOS ALEATÓRIOS (MIX DE DIREÇÕES)
+        const arcosAleatorios = todosOsArcos.map(d => {
+            // Gera um número entre 0 e 1. Se for > 0.5, inverte o sentido.
+            if (Math.random() > 0.7) {
+                return {
+                    ...d, 
+                    startLat: d.endLat, // Inverte: Fim vira Início
+                    startLng: d.endLng,
+                    endLat: d.startLat, // Inverte: Início vira Fim
+                    endLng: d.startLng
+                };
+            } else {
+                // Mantém o sentido original
+                return d;
+            }
+        });
+
         // 3. CRIAÇÃO DO GLOBO
         Globe = new ThreeGlobe()
             .globeImageUrl('https://static.wixstatic.com/media/a6967f_cbed4d361eb14d93aff8dcb6ede40613~mv2.jpg')
             .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
-            .arcsData(todosOsArcos) 
+            // AQUI USAMOS OS DADOS MISTURADOS/ALEATÓRIOS
+            .arcsData(arcosAleatorios) 
             .arcColor(d => t => {
                 const base = new THREE.Color(d.color);       
                 const bright = base.clone();
-                bright.offsetHSL(0, 0, 0.25);               
-
+                bright.offsetHSL(0, 0, 0.25);                
                 const color = base.clone().lerp(bright, t);
-
-                // INVERSÃO DO SENTIDO: Usa 1 - t para que o traço vá do fim para o início
-                const alpha = **1 - t**;  
-                return `rgba(${Math.round(color.r*255)}, ${Math.round(color.g*255)}, ${Math.round(color.b*255)}, ${alpha})`;
+                const alpha = t;  
+                return `rgba(${Math.round(color.r*255)}, ${Math.round(color.g*255)}, ${Math.round(color.b*255)}, ${alpha})`;
             })
             .arcDashLength(0.4)
             .arcDashGap(4)
             .arcDashInitialGap(() => Math.random() * 5)
             .arcDashAnimateTime(1000)
             .arcStroke(1)   
+            // AQUI USAMOS OS DADOS ORIGINAIS (Pontos fixos)
             .pointsData(pointsData)
             .pointAltitude(0)
             .pointColor('color')
@@ -111,13 +124,10 @@ async function init() {
         scene.add(new THREE.AmbientLight(0xffffff, Math.PI));
         scene.add(new THREE.DirectionalLight(0xf5f5f5, 4 * Math.PI));
 
-        // Posição inicial da Câmera
-        camera.position.x = INITIAL_CAMERA_POS_X;
-        camera.position.y = INITIAL_CAMERA_POS_Y;
-        camera.position.z = INITIAL_CAMERA_POS_Z;
+        // Posição inicial da Câmera e Globo
+        camera.position.set(INITIAL_CAMERA_POS_X, INITIAL_CAMERA_POS_Y, INITIAL_CAMERA_POS_Z);
         camera.rotation.x = INITIAL_CAMERA_ROT_X;
         
-        // Posição inicial do Globo (Foco na RCA)
         Globe.rotation.x = INITIAL_GLOBE_ROTATION_X;
         Globe.rotation.y = INITIAL_GLOBE_ROTATION_Y;
 
@@ -127,19 +137,19 @@ async function init() {
         tbControls.rotateSpeed = 5;
         tbControls.zoomSpeed = 0.8;
 
-        // Inicia o loop de animação e o gráfico
+        // Inicia
         onWindowResize();
         animate();
         initializeChart();
 
     } catch (error) {
         console.error("Erro ao carregar ou processar os dados:", error);
-        document.getElementById('globeViz').innerHTML = "Falha ao carregar os dados do mapa. Verifique a consola para detalhes.";
+        document.getElementById('globeViz').innerHTML = "Falha ao carregar os dados do mapa.";
     }
 }
 
 
-// --- FUNÇÕES DE SETUP E ANIMAÇÃO ---
+// --- FUNÇÕES AUXILIARES ---
 
 function createRadialGradientTexture() {
     const size = 256;
@@ -155,7 +165,6 @@ function createRadialGradientTexture() {
     return texture;
 }
 
-// Resize
 function onWindowResize() {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -165,8 +174,6 @@ function onWindowResize() {
 }
 window.addEventListener('resize', onWindowResize);
 
-
-// Loop de animação
 function animate() {
     requestAnimationFrame(animate);
     if (Globe && tbControls) { 
@@ -178,27 +185,14 @@ function animate() {
     }
 }
 
-
-// Chart initialization (mantido)
 function initializeChart() {
     const ctx = document.getElementById('machineChart').getContext('2d');
     const data = {
         labels: ['EUROPA', 'AMÉRICA', 'ÁFRICA', 'ÁSIA', 'Oceânia'],
         datasets: [{
             data: [73.5, 17.9, 0.5, 7.1, 1.0],
-            backgroundColor: [
-                'rgba(128,128,128,0.8)',
-                'rgba(211,211,211,0.8)',
-                'rgba(255,255,255,0.8)',
-                'rgba(80,80,80,0.8)',
-                'rgba(49,47,49,0.8)'
-            ],
-            hoverBackgroundColor: [
-                'rgba(153,153,153,1.0)',
-                'rgba(255,255,255,1.0)',
-                'rgba(204,204,204,1.0)',
-                'rgba(102,102,102,1.0)'
-            ],
+            backgroundColor: ['rgba(128,128,128,0.8)', 'rgba(211,211,211,0.8)', 'rgba(255,255,255,0.8)', 'rgba(80,80,80,0.8)', 'rgba(49,47,49,0.8)'],
+            hoverBackgroundColor: ['rgba(153,153,153,1.0)', 'rgba(255,255,255,1.0)', 'rgba(204,204,204,1.0)', 'rgba(102,102,102,1.0)'],
             borderColor: 'rgba(255,255,255,0.2)',
             borderWidth: 1
         }]
@@ -237,31 +231,83 @@ function initializeChart() {
 }
 
 
-// Lógica do botão Play/Pause (COM REPOSIÇÃO TOTAL E FOCO NA RCA)
+// --- LÓGICA DE INTERAÇÃO DO DOM (TECLADO, RATO, BOTÕES) ---
 document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('playPauseBtn');
-    if (btn) {
-        btn.addEventListener('click', () => {
+
+    // 1. GESTÃO DO CURSOR (Esconder após 5s)
+    let cursorTimer;
+    const manageCursorVisibility = () => {
+        // Mostra o cursor
+        document.body.style.cursor = 'default';
+        
+        // Reinicia o timer
+        clearTimeout(cursorTimer);
+
+        // Define novo timer de 5 segundos
+        cursorTimer = setTimeout(() => {
+            document.body.style.cursor = 'none'; // Esconde
+        }, 5000);
+    };
+
+    // Deteta movimento do rato em toda a página
+    document.addEventListener('mousemove', manageCursorVisibility);
+    manageCursorVisibility(); // Inicia contagem logo ao carregar
+
+
+    // 2. LÓGICA DOS BOTÕES DE RELATÓRIO (CONNECTED / MULTIWASHER)
+    const inputConnected = document.getElementById('daily-report');
+    const inputMultiwasher = document.getElementById('connected-machines');
+
+    const handleEnterToggle = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Impede comportamento padrão
+
+            if (e.target === inputConnected) {
+                // Estava no Connected -> Vai para Multiwasher
+                console.log("Enter no Connected -> Mudando para Multiwasher");
+                inputMultiwasher.checked = true;
+                inputMultiwasher.focus();
+                inputMultiwasher.dispatchEvent(new Event('change'));
+            } 
+            else if (e.target === inputMultiwasher) {
+                // Estava no Multiwasher -> Vai para Connected
+                console.log("Enter no Multiwasher -> Mudando para Connected");
+                inputConnected.checked = true;
+                inputConnected.focus();
+                inputConnected.dispatchEvent(new Event('change'));
+            }
+        }
+    };
+
+    if (inputConnected && inputMultiwasher) {
+        // Adiciona ouvintes de teclado
+        inputConnected.addEventListener('keydown', handleEnterToggle);
+        inputMultiwasher.addEventListener('keydown', handleEnterToggle);
+
+        // --- FOCO INICIAL AUTOMÁTICO ---
+        inputConnected.focus();
+    }
+
+
+    // 3. LÓGICA DO BOTÃO PLAY/PAUSE
+    const btnPlayPause = document.getElementById('playPauseBtn');
+    if (btnPlayPause) {
+        btnPlayPause.addEventListener('click', () => {
             isRotating = !isRotating;
             
             if (isRotating && Globe && tbControls) {
-                // 1. Repor a rotação do globo para focar a República Centro-Africana
+                // Repor rotações e posições
                 Globe.rotation.x = INITIAL_GLOBE_ROTATION_X;
                 Globe.rotation.y = INITIAL_GLOBE_ROTATION_Y;
-
-                // 2. Repor a posição e rotação da câmara
                 camera.position.set(INITIAL_CAMERA_POS_X, INITIAL_CAMERA_POS_Y, INITIAL_CAMERA_POS_Z);
                 camera.rotation.x = INITIAL_CAMERA_ROT_X;
-                
-                // 3. Repor os controlos (anula movimentos manuais do utilizador)
                 tbControls.reset(); 
             }
             
-            btn.innerHTML = isRotating ? 'Pausar Rotação' : 'Iniciar Rotação';
+            btnPlayPause.innerHTML = isRotating ? 'Pausar Rotação' : 'Iniciar Rotação';
         });
     }
 });
-
 
 // --- INÍCIO DA APLICAÇÃO ---
 init();
