@@ -3,7 +3,9 @@ import * as THREE from "https://esm.sh/three";
 import { TrackballControls } from 'https://esm.sh/three/examples/jsm/controls/TrackballControls.js';
 
 // --- CONFIGURAÇÕES ---
-const DATA_URL = 'https://script.google.com/macros/s/AKfycbzr1NKomn0Uo3wY-6kXQPaNv6DokUc4esIYBKzW4_SwNDV43wweAOulnraFfGtAh6ww/exec';
+// Nota: Para máxima velocidade, substitua este link pelo caminho do seu ficheiro local './data.json'
+const DATA_URL = 'https://script.google.com/macros/s/AKfycbxCodP10mNvoFbSvUFe4PqRaiel6-VGjtq7Tdup7BQcbqXYysx87wvSZwD2jxxWYunl/exec';
+
 const ROTATE_SPEED = -0.005;
 const IS_MOBILE = window.innerWidth < 768; // Detectar mobile simples
 
@@ -50,10 +52,8 @@ function createGlobeBase() {
 
     // Material Otimizado
     const globeMaterial = Globe.globeMaterial();
-    // Transparência é custosa. Se puder evitar, melhor. 
-    // Se precisar manter, use depthWrite false para ajudar no sorting.
     globeMaterial.transparent = true; 
-    globeMaterial.opacity = 0.3;
+    globeMaterial.opacity = 0.3; // Opacidade ajustada conforme pedido
     globeMaterial.color = new THREE.Color(0x000000);
     
     scene.add(Globe);
@@ -123,14 +123,14 @@ async function loadData() {
 
     } catch (error) {
         console.error("Erro ao carregar dados:", error);
-        // Se falhar e não tiver cache, mostra erro na UI
+        // O globo continua a funcionar vazio mesmo se der erro
     }
 }
 
 function processData(todosOsArcos) {
     if (!Globe) return;
 
-    // Prepara dados (Mesma lógica sua, apenas movida para cá)
+    // 1. Preparar os PONTOS
     const pointsData = todosOsArcos.map(d => ({
         lat: d.endLat,
         lng: d.endLng,
@@ -138,48 +138,51 @@ function processData(todosOsArcos) {
         color: ['LIS', 'Lisbon'].includes(d.name) ? '#ffffff' : '#0058E8'
     }));
 
-   /* const labelsData = todosOsArcos.map(d => ({
+    // NOTA: As labels estão comentadas para reduzir peso e remover os pontos brancos.
+    // Se quiser ativar novamente, descomente o bloco abaixo E o bloco .labelsData no fim da função.
+    /* const labelsData = todosOsArcos.map(d => ({
         lat: d.endLat,
         lng: d.endLng,
         text: d.name,
         size: 0.001,
         color: 'gray',
-        fontFace: 'Arial' // Fontes padrão carregam mais rápido que custom
-    }));*/
+        fontFace: 'Arial'
+    }));
+    */
 
-    // Atualiza o Globo EXISTENTE
+    // 2. Atualizar o Globo
     Globe
         .arcsData(todosOsArcos)
         .arcColor(d => {
-            // Otimização: Evitar criar novos objetos THREE.Color a cada frame se possível
-            // A string interpolation é rápida, mas a lógica aqui é pesada para muitos arcos.
-            // Simplifiquei para reduzir custo de CPU na renderização.
+            // Cor fixa otimizada (evita calcular lerp a cada frame)
             return ['rgba(0,88,232,0.8)', 'rgba(255,255,255,0.8)']; 
         })
         .arcDashLength(0.4)
         .arcDashGap(4)
         .arcDashInitialGap(() => Math.random() * 5)
-        .arcDashAnimateTime(2000) // Aumentar tempo reduz carga de atualização visual
+        .arcDashAnimateTime(2000)
+        
+        // Configuração dos Pontos
         .pointsData(pointsData)
         .pointColor('color')
         .pointRadius(0.3)
-  
-  // 👇 ADICIONE ESTA LINHA AQUI 👇
-        .pointAltitude(0) 
-        // 👆 0.05 é a altura (ajuste conforme necessário) 👆
-  
+        .pointAltitude(0.000001); // 0.01 evita o "piscar" (z-fighting) com a superfície
+
+        // Configuração das Labels (REMOVIDA para evitar erros com variável indefinida)
+        // Se quiser voltar a usar, descomente a variável labelsData lá em cima e adicione aqui:
+        /*
         .labelsData(labelsData)
         .labelColor('blue')
         .labelSize('size')
         .labelText('text')
-        .labelResolution(0); // OTIMIZAÇÃO: Reduzido de 3 para 1.5 (menos memória)
+        .labelResolution(1);
+        */
 }
 
 
 // --- AUXILIARES E ANIMAÇÃO ---
 
 function createRadialGradientTexture() {
-    // (Manteve-se igual, é leve o suficiente)
     const size = 256;
     const canvas = document.createElement('canvas');
     canvas.width = size;
@@ -188,7 +191,7 @@ function createRadialGradientTexture() {
     const gradient = ctx.createRadialGradient(size / 2, size / 2, 0.5, size / 2, size / 2, size / 2);
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, size, size);
-    const texture = new THREE.Texture(canvas); // Passar canvas direto no construtor
+    const texture = new THREE.Texture(canvas); 
     texture.needsUpdate = true;
     return texture;
 }
@@ -215,7 +218,11 @@ function animate() {
 }
 
 function initializeChart() {
-    const ctx = document.getElementById('machineChart').getContext('2d');
+    // Verifica se o elemento existe antes de criar o gráfico
+    const chartElement = document.getElementById('machineChart');
+    if (!chartElement) return;
+
+    const ctx = chartElement.getContext('2d');
     const data = {
         labels: ['EUROPA', 'AMÉRICA', 'ÁFRICA', 'ÁSIA', 'Oceânia'],
         datasets: [{
