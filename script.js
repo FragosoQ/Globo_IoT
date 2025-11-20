@@ -3,8 +3,9 @@ import * as THREE from "https://esm.sh/three";
 import { TrackballControls } from 'https://esm.sh/three/examples/jsm/controls/TrackballControls.js';
 
 // --- 1. IMPORTAR FIREBASE ---
+// ADICIONADO: 'doc' e 'getDoc' para ler o contador específico
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- 2. CONFIGURAÇÃO DO FIREBASE ---
 const firebaseConfig = {
@@ -21,8 +22,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// --- CONSTANTES DE CONFIGURAÇÃO ---
 const ROTATE_SPEED = -0.005;
 const IS_MOBILE = window.innerWidth < 768;
+
+// POSIÇÕES INICIAIS (Reset)
+const INITIAL_CAMERA_POS_X = -50;
+const INITIAL_CAMERA_POS_Y = 200;
+const INITIAL_CAMERA_POS_Z = 350;
+const INITIAL_CAMERA_ROT_X = THREE.MathUtils.degToRad(20);
+
+const INITIAL_GLOBE_ROTATION_X = THREE.MathUtils.degToRad(-5.667); 
+const INITIAL_GLOBE_ROTATION_Y = THREE.MathUtils.degToRad(-20.0); 
 
 // --- VARIÁVEIS GLOBAIS ---
 let isRotating = true;
@@ -44,11 +55,14 @@ function init() {
     setupScene();
     animate();
 
-    // 1. Carrega o Globo (Coleção 'paises')
+    // 1. Carrega o Globo (Paises)
     loadData();
 
-    // 2. Carrega o Gráfico (Coleção 'continentes')
+    // 2. Carrega o Gráfico (Continentes)
     loadChartData();
+
+    // 3. Carrega o Contador Total (Equipamentos) - NOVO
+    loadTotalCounter();
 }
 
 function createGlobeBase() {
@@ -82,12 +96,14 @@ function setupScene() {
     scene.add(new THREE.AmbientLight(0xffffff, Math.PI));
     scene.add(new THREE.DirectionalLight(0xf5f5f5, 4 * Math.PI));
 
-    camera.position.set(-50, 200, 350);
-    camera.rotation.x = THREE.MathUtils.degToRad(20);
+    // Posição inicial da câmara
+    camera.position.set(INITIAL_CAMERA_POS_X, INITIAL_CAMERA_POS_Y, INITIAL_CAMERA_POS_Z);
+    camera.rotation.x = INITIAL_CAMERA_ROT_X;
     
+    // Posição inicial do globo
     if (Globe) {
-        Globe.rotation.x = THREE.MathUtils.degToRad(-5.667);
-        Globe.rotation.y = THREE.MathUtils.degToRad(-20.0);
+        Globe.rotation.x = INITIAL_GLOBE_ROTATION_X;
+        Globe.rotation.y = INITIAL_GLOBE_ROTATION_Y;
     }
 
     tbControls = new TrackballControls(camera, renderer.domElement);
@@ -99,6 +115,30 @@ function setupScene() {
     onWindowResize();
 }
 
+// --- NOVO: CARREGAMENTO DO CONTADOR TOTAL ---
+async function loadTotalCounter() {
+    try {
+        console.log("📡 Contador: A ler total de equipamentos...");
+        // Vai buscar o documento 'contador' dentro da coleção 'equipamentos'
+        const docRef = doc(db, "equipamentos", "contador");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const total = docSnap.data().total;
+            console.log("✅ Contador: Total encontrado:", total);
+            
+            const counterElement = document.getElementById('total-machines');
+            if (counterElement) {
+                counterElement.innerText = total;
+            }
+        } else {
+            console.log("⚠️ Contador: Documento não encontrado!");
+        }
+    } catch (error) {
+        console.error("❌ Contador: Erro ao carregar:", error);
+    }
+}
+
 // --- CARREGAMENTO DO GLOBO (Paises) ---
 async function loadData() {
     try {
@@ -106,11 +146,6 @@ async function loadData() {
         if (cachedData) {
             console.log("⚡ Globo: Carregando do cache...");
             processData(JSON.parse(cachedData));
-            
-            // Atualiza contador com dados do cache (opcional, mas bom para UX)
-            const cachedArr = JSON.parse(cachedData);
-            const counterEl = document.getElementById('total-machines');
-            if(counterEl) counterEl.innerText = cachedArr.length;
         }
 
         console.log("📡 Globo: Conectando ao Firebase...");
@@ -128,13 +163,6 @@ async function loadData() {
                 color: data.color
             });
         });
-
-        // --- NOVO: Atualiza o número total no HTML ---
-        const counterElement = document.getElementById('total-machines');
-        if (counterElement) {
-            counterElement.innerText = firebaseData.length;
-        }
-        // ---------------------------------------------
 
         if (firebaseData.length > 0) {
             if (JSON.stringify(firebaseData) !== cachedData) {
@@ -239,7 +267,7 @@ function animate() {
 // --- GRÁFICO DINÂMICO E LEGENDA HTML ---
 function initializeChart(labelsFromDB, valuesFromDB, colorsFromDB) {
     const chartElement = document.getElementById('machineChart');
-    const listElement = document.getElementById('chart-details'); // ID da lista UL no HTML
+    const listElement = document.getElementById('chart-details'); 
     
     if (!chartElement) return;
 
@@ -262,7 +290,7 @@ function initializeChart(labelsFromDB, valuesFromDB, colorsFromDB) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }, // Esconde a legenda do próprio Canvas
+                legend: { display: false }, 
                 tooltip: {
                     callbacks: {
                         label: function (c) {
@@ -286,17 +314,13 @@ function initializeChart(labelsFromDB, valuesFromDB, colorsFromDB) {
         }
     };
 
-    // Destrói gráfico antigo se existir para evitar sobreposição
     if (window.myPieChart) {
         window.myPieChart.destroy();
     }
     window.myPieChart = new Chart(ctx, config);
 
-    // --- GERAÇÃO DA LISTA HTML (LEGENDA) ---
     if (listElement) {
-        listElement.innerHTML = ''; // Limpa lista antiga
-        
-        // Calcula total para as percentagens
+        listElement.innerHTML = ''; 
         const total = valuesFromDB.reduce((a, b) => a + b, 0);
 
         labelsFromDB.forEach((label, index) => {
@@ -304,7 +328,6 @@ function initializeChart(labelsFromDB, valuesFromDB, colorsFromDB) {
             const color = colorsFromDB[index];
             const percentage = ((value / total) * 100).toFixed(1) + '%';
 
-            // Cria o elemento LI
             const li = document.createElement('li');
             li.innerHTML = `
                 <span class="color-swatch" style="background-color: ${color};"></span>
@@ -316,13 +339,33 @@ function initializeChart(labelsFromDB, valuesFromDB, colorsFromDB) {
     }
 }
 
+// --- LÓGICA DO BOTÃO PLAY/PAUSE (Reset Posição) ---
 document.addEventListener('DOMContentLoaded', () => {
     const btnPlayPause = document.getElementById('playPauseBtn');
+    
     if (btnPlayPause) {
         btnPlayPause.addEventListener('click', () => {
             isRotating = !isRotating;
-            btnPlayPause.innerHTML = isRotating ? 'Pausar Rotação' : 'Iniciar Rotação';
+            
+            if (isRotating) {
+                if (Globe) {
+                    Globe.rotation.x = INITIAL_GLOBE_ROTATION_X;
+                    Globe.rotation.y = INITIAL_GLOBE_ROTATION_Y;
+                }
+                
+                camera.position.set(INITIAL_CAMERA_POS_X, INITIAL_CAMERA_POS_Y, INITIAL_CAMERA_POS_Z);
+                camera.rotation.x = INITIAL_CAMERA_ROT_X;
+                
+                if (tbControls) {
+                    tbControls.reset();
+                }
+                
+                btnPlayPause.innerHTML = 'Pausar Rotação';
+            } else {
+                btnPlayPause.innerHTML = 'Iniciar Rotação';
+            }
         });
     }
+    
     init();
 });
