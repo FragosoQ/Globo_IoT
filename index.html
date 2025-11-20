@@ -1,75 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Somengil - IoT Office Screen</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Somengil - IoT Office Screen</title>
 
-<link rel="stylesheet" href="styles.css">
-<link href="https://fonts.cdnfonts.com/css/satoshi" rel="stylesheet">
-<link rel="icon" type="images/icon" href="images/favicon.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.cdnfonts.com/css/satoshi" rel="stylesheet">
+    <link rel="icon" type="image/jpeg" href="images/favicon.jpg">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script type="module" src="script.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://esm.sh/three",
-    "three/": "https://esm.sh/three/"
-  }
-}
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script type="module" src="script.js"></script>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.sh/three",
+        "three/": "https://esm.sh/three/"
+      }
+    }
+    </script>
 </head>
 
 <body>
 
-<div id="toggle-container">
-    <input type="radio" id="daily-report" name="report-type" class="toggle-input" checked>
-    <label for="daily-report" class="toggle-btn toggle-btn-label">CONNECTED MACHINES</label>
+    <div id="toggle-container">
+        <input type="radio" id="daily-report" name="report-type" class="toggle-input" checked>
+        <label for="daily-report" class="toggle-btn toggle-btn-label">CONNECTED MACHINES</label>
 
-    <input type="radio" id="connected-machines" name="report-type" class="toggle-input">
-    <label for="connected-machines" class="toggle-btn toggle-btn-label">MULTIWASHER</label>
+        <input type="radio" id="connected-machines" name="report-type" class="toggle-input">
+        <label for="connected-machines" class="toggle-btn toggle-btn-label">MULTIWASHER</label>
 
-    <span class="toggle-slider"></span>
-</div>
-
-<div id="info-box">
-    <div class="number">364</div>
-    <div class="label">EQUIPMENTS</div>
-    <div class="label">CONNECTED</div>
-    <div class="label">WORLDWIDE</div>
-</div>
-
-<div id="pie-chart-card">
-    <h2></h2>
-    <div id="canvas-container">
-        <canvas id="machineChart"></canvas>
+        <span class="toggle-slider"></span>
     </div>
 
-    <ul id="chart-details">
-        <li><span class="color-swatch" style="background-color: #808080;"></span><span class="label-text">EUROPA</span><span class="chart-percentage">73.5%</span></li>
-        <li><span class="color-swatch" style="background-color: #D3D3D3;"></span><span class="label-text">AMÉRICA</span><span class="chart-percentage">17.9%</span></li>
-        <li><span class="color-swatch" style="background-color: #FFFFFF;"></span><span class="label-text">ÁFRICA</span><span class="chart-percentage">0.5%</span></li>
-        <li><span class="color-swatch" style="background-color: #505050;"></span><span class="label-text">ÁSIA</span><span class="chart-percentage">7.1%</span></li>
-        <li><span class="color-swatch" style="background-color: #312f31;"></span><span class="label-text">OCEÂNIA</span><span class="chart-percentage">1.0%</span></li>
-    </ul>
-</div>
+    <div id="info-box">
+        <div class="number" id="total-machines">--</div>
+        <div class="label">EQUIPMENTS</div>
+        <div class="label">CONNECTED</div>
+        <div class="label">WORLDWIDE</div>
+    </div>
 
-<div id="play-pause-container">
-    <button id="playPauseBtn">Pausar Rotação</button>
-</div>
+    <div id="pie-chart-card">
+        <h2></h2>
+        <div id="canvas-container">
+            <canvas id="machineChart"></canvas>
+        </div>
 
-<div id="globeViz"></div>
+        <ul id="chart-details"></ul>
+    </div>
 
-  <a href="tabela.html" class="cursor-pointer">
-<img id="logo" src="https://static.wixstatic.com/media/a6967f_b1478a338afc4870879e1ba83f915dc5~mv2.png" alt="Logo Multiwasher" />
-  </a>
-  
-  <a href="add.html" class="cursor-pointer">
-<img id="logo2" src="https://static.wixstatic.com/media/a6967f_691cf1aade3c471c816d1071b0c6ebdd~mv2.png" alt="Logo Somengil" />
-    </a>
+    <div id="play-pause-container">
+        <button id="playPauseBtn">Pausar Rotação</button>
+    </div>
 
+    <div id="globeViz"></div>
 
+    <img id="logo" src="https://static.wixstatic.com/media/a6967f_0c98d57376be4290aba002d8ba028a92~mv2.webp" alt="Logo Multiwasher" />
+    <img id="logo2" src="https://static.wixstatic.com/media/a6967f_806fe8fab41d42888a69ac911bb0a451~mv2.png" alt="Logo Somengil" />
 
 </body>
 </html>
