@@ -6,7 +6,7 @@ import { TrackballControls } from 'https://esm.sh/three/examples/jsm/controls/Tr
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// --- 2. CONFIGURAÇÃO DO FIREBASE (As tuas chaves) ---
+// --- 2. CONFIGURAÇÃO DO FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyDJMjPLeP2IwgmoL25Y5Sj93OonucFsJRE",
   authDomain: "bdcountries.firebaseapp.com",
@@ -29,7 +29,6 @@ let isRotating = true;
 let Globe;
 let tbControls;
 
-// Otimização: Desligar antialias em mobile para ganhar FPS
 const renderer = new THREE.WebGLRenderer({ 
     antialias: !IS_MOBILE, 
     powerPreference: "high-performance",
@@ -39,16 +38,17 @@ const renderer = new THREE.WebGLRenderer({
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-// --- INICIALIZAÇÃO IMEDIATA ---
+// --- INICIALIZAÇÃO ---
 function init() {
     createGlobeBase();
     setupScene();
     animate();
 
-    // AQUI ESTÁ A MUDANÇA: Carrega do Firebase em vez do Google Script
+    // 1. Carrega o Globo (Coleção 'paises')
     loadData();
 
-    initializeChart();
+    // 2. Carrega o Gráfico (Coleção 'continentes')
+    loadChartData();
 }
 
 function createGlobeBase() {
@@ -59,7 +59,6 @@ function createGlobeBase() {
         .atmosphereColor('#3a228a')
         .atmosphereAltitude(0.15);
 
-    // Material Otimizado
     const globeMaterial = Globe.globeMaterial();
     globeMaterial.transparent = true; 
     globeMaterial.opacity = 1;
@@ -100,27 +99,28 @@ function setupScene() {
     onWindowResize();
 }
 
-// --- 3. CARREGAMENTO DE DADOS (ATUALIZADO PARA FIREBASE) ---
+// --- CARREGAMENTO DO GLOBO (Paises) ---
 async function loadData() {
     try {
-        // Tentar pegar do Cache primeiro
         const cachedData = localStorage.getItem('globeDataFirebase');
         if (cachedData) {
-            console.log("⚡ Carregando do cache...");
+            console.log("⚡ Globo: Carregando do cache...");
             processData(JSON.parse(cachedData));
+            
+            // Atualiza contador com dados do cache (opcional, mas bom para UX)
+            const cachedArr = JSON.parse(cachedData);
+            const counterEl = document.getElementById('total-machines');
+            if(counterEl) counterEl.innerText = cachedArr.length;
         }
 
-        console.log("📡 Conectando ao Firebase...");
-        
-        // Ler a coleção 'paises'
+        console.log("📡 Globo: Conectando ao Firebase...");
         const querySnapshot = await getDocs(collection(db, "paises"));
         
         const firebaseData = [];
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            // Mapear os dados do Firestore para o formato do Globo
             firebaseData.push({
-                name: doc.id, // O ID do documento é o nome (ex: DUBAI)
+                name: doc.id,
                 startLat: data.startLat,
                 startLng: data.startLng,
                 endLat: data.endLat,
@@ -129,35 +129,68 @@ async function loadData() {
             });
         });
 
-        // Se os dados mudaram ou não tinha cache, atualiza
+        // --- NOVO: Atualiza o número total no HTML ---
+        const counterElement = document.getElementById('total-machines');
+        if (counterElement) {
+            counterElement.innerText = firebaseData.length;
+        }
+        // ---------------------------------------------
+
         if (firebaseData.length > 0) {
             if (JSON.stringify(firebaseData) !== cachedData) {
-                console.log("✅ Dados atualizados do Firebase!");
+                console.log("✅ Globo: Dados atualizados!");
                 localStorage.setItem('globeDataFirebase', JSON.stringify(firebaseData));
                 processData(firebaseData);
             }
         } else {
-            console.log("⚠️ Nenhum dado encontrado no Firebase.");
+            console.log("⚠️ Globo: Nenhum dado encontrado.");
         }
 
     } catch (error) {
-        console.error("❌ Erro ao carregar dados:", error);
+        console.error("❌ Globo: Erro ao carregar:", error);
     }
 }
+
+// --- CARREGAMENTO DO GRÁFICO (Continentes) ---
+async function loadChartData() {
+    try {
+        console.log("📡 Gráfico: A ler coleção 'continentes'...");
+        const querySnapshot = await getDocs(collection(db, "continentes"));
+
+        const labels = [];
+        const values = [];
+        const colors = [];
+
+        querySnapshot.forEach((doc) => {
+            const d = doc.data();
+            labels.push(doc.id); 
+            values.push(d.value);
+            colors.push(d.color || '#cccccc'); 
+        });
+
+        if (labels.length > 0) {
+            console.log("✅ Gráfico: Dados recebidos:", labels);
+            initializeChart(labels, values, colors);
+        } else {
+            console.warn("⚠️ Gráfico: Coleção vazia.");
+        }
+
+    } catch (error) {
+        console.error("❌ Gráfico: Erro ao carregar:", error);
+    }
+}
+
 
 function processData(todosOsArcos) {
     if (!Globe) return;
 
-    // 1. Preparar os PONTOS
     const pointsData = todosOsArcos.map(d => ({
         lat: d.endLat,
         lng: d.endLng,
-        // Adicionei nomes em MAIÚSCULAS pois no Firestore eles estão em maiúsculas (ex: DUBAI, PORTUGAL)
         size: ['LIS', 'OPO', 'Lisbon', 'Porto', 'PORTUGAL', 'DUBAI', 'LISBOA'].includes(d.name) ? 0.25 : 0.2, 
         color: ['LIS', 'Lisbon', 'PORTUGAL', 'DUBAI', 'LISBOA'].includes(d.name) ? '#ffffff' : '#0058E8'
     }));
 
-    // 2. Atualizar o Globo
     Globe
         .arcsData(todosOsArcos)
         .arcColor(d => {
@@ -167,15 +200,13 @@ function processData(todosOsArcos) {
         .arcDashGap(4)
         .arcDashInitialGap(() => Math.random() * 5)
         .arcDashAnimateTime(2000)
-        
         .pointsData(pointsData)
         .pointColor('color')
         .pointRadius(0.3)
         .pointAltitude(0.000001);
 }
 
-// --- AUXILIARES E ANIMAÇÃO ---
-
+// --- AUXILIARES ---
 function createRadialGradientTexture() {
     const size = 256;
     const canvas = document.createElement('canvas');
@@ -200,32 +231,30 @@ function onWindowResize() {
 
 function animate() {
     requestAnimationFrame(animate);
-    
-    if (Globe) { 
-        if (isRotating) {
-            Globe.rotation.y += ROTATE_SPEED;
-        }
-    }
-    
+    if (Globe && isRotating) Globe.rotation.y += ROTATE_SPEED;
     if (tbControls) tbControls.update();
     renderer.render(scene, camera);
 }
 
-function initializeChart() {
+// --- GRÁFICO DINÂMICO E LEGENDA HTML ---
+function initializeChart(labelsFromDB, valuesFromDB, colorsFromDB) {
     const chartElement = document.getElementById('machineChart');
+    const listElement = document.getElementById('chart-details'); // ID da lista UL no HTML
+    
     if (!chartElement) return;
 
     const ctx = chartElement.getContext('2d');
+    
     const data = {
-        labels: ['EUROPA', 'AMÉRICA', 'ÁFRICA', 'ÁSIA', 'Oceânia'],
+        labels: labelsFromDB, 
         datasets: [{
-            data: [73.5, 17.9, 0.5, 7.1, 1.0],
-            backgroundColor: ['rgba(128,128,128,0.8)', 'rgba(211,211,211,0.8)', 'rgba(255,255,255,0.8)', 'rgba(80,80,80,0.8)', 'rgba(49,47,49,0.8)'],
-            hoverBackgroundColor: ['rgba(153,153,153,1.0)', 'rgba(255,255,255,1.0)', 'rgba(204,204,204,1.0)', 'rgba(102,102,102,1.0)'],
+            data: valuesFromDB, 
+            backgroundColor: colorsFromDB, 
             borderColor: 'rgba(255,255,255,0.2)',
             borderWidth: 1
         }]
     };
+
     const config = {
         type: 'pie',
         data,
@@ -233,7 +262,7 @@ function initializeChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: { display: false }, // Esconde a legenda do próprio Canvas
                 tooltip: {
                     callbacks: {
                         label: function (c) {
@@ -256,10 +285,37 @@ function initializeChart() {
             }
         }
     };
-    new Chart(ctx, config);
+
+    // Destrói gráfico antigo se existir para evitar sobreposição
+    if (window.myPieChart) {
+        window.myPieChart.destroy();
+    }
+    window.myPieChart = new Chart(ctx, config);
+
+    // --- GERAÇÃO DA LISTA HTML (LEGENDA) ---
+    if (listElement) {
+        listElement.innerHTML = ''; // Limpa lista antiga
+        
+        // Calcula total para as percentagens
+        const total = valuesFromDB.reduce((a, b) => a + b, 0);
+
+        labelsFromDB.forEach((label, index) => {
+            const value = valuesFromDB[index];
+            const color = colorsFromDB[index];
+            const percentage = ((value / total) * 100).toFixed(1) + '%';
+
+            // Cria o elemento LI
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="color-swatch" style="background-color: ${color};"></span>
+                <span class="label-text">${label}</span>
+                <span class="chart-percentage">${percentage}</span>
+            `;
+            listElement.appendChild(li);
+        });
+    }
 }
 
-// DOM Events
 document.addEventListener('DOMContentLoaded', () => {
     const btnPlayPause = document.getElementById('playPauseBtn');
     if (btnPlayPause) {
