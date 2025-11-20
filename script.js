@@ -62,7 +62,7 @@ function createGlobeBase() {
     // Material Otimizado
     const globeMaterial = Globe.globeMaterial();
     globeMaterial.transparent = true; 
-    globeMaterial.opacity = 0.3;
+    globeMaterial.opacity = 1;
     globeMaterial.color = new THREE.Color(0x000000);
     
     scene.add(Globe);
