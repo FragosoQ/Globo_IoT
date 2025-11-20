@@ -215,8 +215,8 @@ function processData(todosOsArcos) {
     const pointsData = todosOsArcos.map(d => ({
         lat: d.endLat,
         lng: d.endLng,
-        size: ['LIS', 'OPO', 'Lisbon', 'Porto', 'PORTUGAL', 'DUBAI', 'LISBOA'].includes(d.name) ? 0.25 : 0.2, 
-        color: ['LIS', 'Lisbon', 'PORTUGAL', 'DUBAI', 'LISBOA'].includes(d.name) ? '#ffffff' : '#0058E8'
+        size: ['LIS', 'OPO', 'Lisbon', 'Porto', 'PORTUGAL', 'LISBOA'].includes(d.name) ? 0.25 : 0.2, 
+        color: ['LIS', 'Lisbon', 'PORTUGAL', 'LISBOA'].includes(d.name) ? '#ffffff' : '#0058E8'
     }));
 
     Globe
