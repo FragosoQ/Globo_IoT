@@ -42,8 +42,8 @@ function init() {
 
 function createGlobeBase() {
     Globe = new ThreeGlobe()
-        .globeImageUrl('https://static.wixstatic.com/media/a6967f_c8009fd3be5a499782d5b778a2f7483e~mv2.png')
-        .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
+        .globeImageUrl('https://static.wixstatic.com/media/a6967f_41ed68ec835e4ed8a883f6977a948234~mv2.webp')
+        .bumpImageUrl('https://static.wixstatic.com/media/a6967f_6fb6649008654e25b3ec9fac0260931b~mv2.webp')
         .showAtmosphere(true) // Atmosfera é leve e bonita
         .atmosphereColor('#3a228a')
         .atmosphereAltitude(0.15);
@@ -214,13 +214,49 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// Lógica do gráfico mantida separada...
 function initializeChart() {
-    // ... seu código do chart.js ...
-    // Certifique-se de que o elemento canvas existe antes de chamar
-    if(document.getElementById('machineChart')) {
-         // inserir código do chart aqui
-    }
+    const ctx = document.getElementById('machineChart').getContext('2d');
+    const data = {
+        labels: ['EUROPA', 'AMÉRICA', 'ÁFRICA', 'ÁSIA', 'Oceânia'],
+        datasets: [{
+            data: [73.5, 17.9, 0.5, 7.1, 1.0],
+            backgroundColor: ['rgba(128,128,128,0.8)', 'rgba(211,211,211,0.8)', 'rgba(255,255,255,0.8)', 'rgba(80,80,80,0.8)', 'rgba(49,47,49,0.8)'],
+            hoverBackgroundColor: ['rgba(153,153,153,1.0)', 'rgba(255,255,255,1.0)', 'rgba(204,204,204,1.0)', 'rgba(102,102,102,1.0)'],
+            borderColor: 'rgba(255,255,255,0.2)',
+            borderWidth: 1
+        }]
+    };
+    const config = {
+        type: 'pie',
+        data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (c) {
+                            let label = c.label || '';
+                            if (label) label += ': ';
+                            if (c.parsed !== null) {
+                                const total = c.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                const percentage = ((c.parsed / total) * 100).toFixed(1);
+                                label += percentage + '%';
+                            }
+                            return label;
+                        }
+                    },
+                    bodyColor: '#333',
+                    titleColor: '#333',
+                    backgroundColor: 'rgba(255,255,255,0.9)',
+                    borderColor: '#888',
+                    borderWidth: 1
+                }
+            }
+        }
+    };
+    new Chart(ctx, config);
 }
 
 // DOM Events
